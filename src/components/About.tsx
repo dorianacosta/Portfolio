@@ -57,7 +57,7 @@ export function About() {
                   <div className="w-full h-full rounded-2xl bg-background" />
                 </div>
                 <img
-                  src="/profile.jpeg"
+                  src={`${import.meta.env.BASE_URL}profile.jpeg`}
                   alt="Dorian Acosta"
                   className="absolute inset-[2px] w-[calc(100%-4px)] h-[calc(100%-4px)] rounded-2xl object-cover object-top shadow-2xl"
                 />
