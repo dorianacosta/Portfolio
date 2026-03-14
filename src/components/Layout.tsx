@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { EtheralShadow } from "@/components/ui/etheral-shadow";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect } from "react";
 
 export function Layout() {
@@ -27,18 +27,15 @@ export function Layout() {
       </div>
 
       {!isHome && <Nav />}
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={pathname}
-          className={`flex-1${isHome ? "" : " pt-12"}`}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
-        >
-          <Outlet />
-        </motion.main>
-      </AnimatePresence>
+      <motion.main
+        key={pathname}
+        className={`flex-1${isHome ? "" : " pt-12"}`}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease: "easeOut" }}
+      >
+        <Outlet />
+      </motion.main>
       {!isHome && <Footer />}
     </div>
   );

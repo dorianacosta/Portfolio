@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { DisplayCard } from "@/components/ui/display-cards";
 import { cvData } from "@/data/cv";
 import { User, Briefcase, FolderOpen, Zap, GraduationCap, Mail } from "lucide-react";
@@ -68,8 +69,34 @@ const navCards = [
 
 export function Hero() {
   return (
-    <section className="min-h-screen flex items-center justify-center px-6">
-      <div className="grid [grid-template-areas:'stack'] place-items-center -translate-x-[11.25rem] -translate-y-[6.09rem]">
+    <motion.section
+      className="relative min-h-screen flex items-center justify-center px-6"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.9, ease: "easeOut" }}
+    >
+      {/* Name + title — pinned to top center */}
+      <motion.div
+        className="absolute top-6 left-1/2 -translate-x-1/2 text-center select-none whitespace-nowrap"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+      >
+        <p className="text-xl font-bold tracking-[0.12em] text-white">
+          Dorian Acosta
+        </p>
+        <p className="text-xs text-white tracking-[0.22em] uppercase mt-1">
+          CS Major &nbsp;·&nbsp; AI &amp; Software Engineer
+        </p>
+      </motion.div>
+
+      {/* Navigation card stack — original centered position */}
+      <motion.div
+        className="grid [grid-template-areas:'stack'] place-items-center -translate-x-[11.25rem] -translate-y-[6.09rem]"
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+      >
         {navCards.map(({ to, icon, title, description, date, className }) => (
           <Link
             key={to}
@@ -86,7 +113,8 @@ export function Hero() {
             />
           </Link>
         ))}
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 }
+

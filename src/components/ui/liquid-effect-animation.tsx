@@ -1,6 +1,4 @@
 import { useEffect, useRef } from "react"
-import { motion } from "framer-motion"
-import { TypingEffect } from "@/components/ui/typing-effect"
 import { EtheralShadow } from "@/components/ui/etheral-shadow"
 
 export function LiquidEffectAnimation() {
@@ -17,11 +15,58 @@ export function LiquidEffectAnimation() {
         const canvas = document.getElementById('liquid-canvas');
         if (canvas) {
           const app = LiquidBackground(canvas);
-          app.liquidPlane.material.color.set(0x0d0d0d);
-          app.liquidPlane.material.metalness = 0.9;
-          app.liquidPlane.material.roughness = 0.1;
+          app.liquidPlane.material.color.set(0xffffff);
+          app.liquidPlane.material.metalness = 0.15;
+          app.liquidPlane.material.roughness = 0.85;
           app.liquidPlane.uniforms.displacementScale.value = 4.5;
-          app.setRain(false);
+          app.setRain(true);
+          app.setRainTime(0.24);
+
+          // Build text texture at high resolution
+          const dpr = Math.max(window.devicePixelRatio || 1, 2);
+          const W = 2048 * dpr;
+          const H = 1152 * dpr;
+          const tc = document.createElement('canvas');
+          tc.width = W;
+          tc.height = H;
+          const ctx = tc.getContext('2d');
+          ctx.scale(dpr, dpr);
+          ctx.clearRect(0, 0, 2048, 1152);
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+
+          const cx = 1024;
+
+          // Name
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = 'rgba(255,255,255,0.97)';
+          ctx.font = '200 112px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+          ctx.letterSpacing = '8px';
+          ctx.fillText('Dorian Acosta', cx, 548);
+
+          // Decorative divider
+          ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(cx - 80, 604); ctx.lineTo(cx - 24, 604); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(cx + 24, 604); ctx.lineTo(cx + 80, 604); ctx.stroke();
+          ctx.fillStyle = 'rgba(255,255,255,0.22)';
+          ctx.font = '13px ui-sans-serif, sans-serif';
+          ctx.letterSpacing = '0px';
+          ctx.fillText('✦', cx, 604);
+
+          // Subtitle
+          ctx.fillStyle = 'rgba(255,255,255,0.55)';
+          ctx.font = '300 15px ui-sans-serif, system-ui, sans-serif';
+          ctx.letterSpacing = '8px';
+          ctx.fillText('CS  MAJOR', cx, 638);
+
+          app.loadImage(tc.toDataURL());
+
+          // Block mouse interaction
+          window.__liquidMouseBlock = function(e) { e.stopPropagation(); };
+          document.addEventListener('pointermove', window.__liquidMouseBlock, true);
+          document.addEventListener('click', window.__liquidMouseBlock, true);
           window.__liquidApp = app;
         }
       `
@@ -30,6 +75,11 @@ export function LiquidEffectAnimation() {
 
     return () => {
       clearTimeout(timer)
+      if (window.__liquidMouseBlock) {
+        document.removeEventListener('pointermove', window.__liquidMouseBlock, true)
+        document.removeEventListener('click', window.__liquidMouseBlock, true)
+        window.__liquidMouseBlock = undefined
+      }
       if (window.__liquidApp?.dispose) {
         window.__liquidApp.dispose()
         window.__liquidApp = undefined
@@ -42,7 +92,7 @@ export function LiquidEffectAnimation() {
 
   return (
     <div className="fixed inset-0 overflow-hidden">
-      {/* Same EtheralShadow background as the main site */}
+      {/* Site background */}
       <div className="absolute inset-0">
         <EtheralShadow
           color="rgba(180, 180, 180, 1)"
@@ -51,68 +101,17 @@ export function LiquidEffectAnimation() {
           sizing="fill"
           style={{ width: "100%", height: "100%" }}
         />
-        <div className="absolute inset-0 bg-background" />
+        <div className="absolute inset-0 bg-background/92" />
       </div>
 
-      {/* Three.js ripple canvas blended on top */}
+      {/* Three.js ripple canvas — screen blend so black areas are transparent,
+          white text areas glow through and ripple with displaced UVs */}
       <canvas
         ref={canvasRef}
         id="liquid-canvas"
         className="absolute inset-0 w-full h-full"
-        style={{ opacity: 0.28, mixBlendMode: "screen" }}
+        style={{ opacity: 1, mixBlendMode: "screen" }}
       />
-
-      {/* Text */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full gap-6 select-none">
-        <motion.div
-          className="h-px w-12 bg-white/25"
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 0.9, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-        />
-
-        <div className="flex flex-col items-center gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.0, delay: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-          >
-            <TypingEffect
-              texts={["Dorian Acosta"]}
-              typingSpeed={80}
-              rotationInterval={999999}
-              className="shimmer-text text-5xl sm:text-7xl md:text-8xl font-light tracking-wide text-foreground"
-            />
-          </motion.div>
-
-          <motion.div
-            className="flex items-center gap-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.6, ease: "easeOut" }}
-          >
-            <span className="h-px w-8 bg-white/20" />
-            <span className="text-[9px] tracking-[0.5em] text-white/30">✦</span>
-            <span className="h-px w-8 bg-white/20" />
-          </motion.div>
-
-          <motion.p
-            className="text-[11px] sm:text-xs font-light tracking-[0.5em] uppercase text-white/40"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 1.8, ease: [0.21, 0.47, 0.32, 0.98] }}
-          >
-            CS Major
-          </motion.p>
-        </div>
-
-        <motion.div
-          className="h-px w-12 bg-white/25"
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 0.9, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-        />
-      </div>
     </div>
   )
 }
@@ -120,5 +119,6 @@ export function LiquidEffectAnimation() {
 declare global {
   interface Window {
     __liquidApp?: any
+    __liquidMouseBlock?: (e: Event) => void
   }
 }

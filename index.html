@@ -15,13 +15,15 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <!-- Umami Cloud Analytics — replace data-website-id with your site ID -->
-    <script
-      defer
-      src="https://cloud.umami.is/script.js"
-      data-website-id="YOUR_UMAMI_WEBSITE_ID"
-      data-domains="YOUR_GITHUB_PAGES_DOMAIN"
-    ></script>
+    <!-- Google Analytics 4 — replace G-XXXXXXXXXX with your Measurement ID -->
+    <!-- Get yours at: https://analytics.google.com → Admin → Create Property -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
   </head>
   <body>
     <div id="root"></div>
